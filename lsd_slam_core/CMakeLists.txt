@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   rosbag
 )
 
+find_package(cmake_modules REQUIRED)
 find_package(Eigen REQUIRED)
 find_package(X11 REQUIRED)
 include(cmake/FindG2O.cmake)
@@ -97,18 +98,21 @@ include_directories(
 
 # build shared library.
 add_library(lsdslam SHARED ${SOURCE_FILES})
-target_link_libraries(lsdslam ${FABMAP_LIB} ${G2O_LIBRARIES} ${catkin_LIBRARIES} csparse cxsparse )
+target_link_libraries(lsdslam ${FABMAP_LIB} ${G2O_LIBRARIES} ${catkin_LIBRARIES} csparse cxsparse X11)
+add_dependencies(lsdslam lsd_slam_viewer_generate_messages_cpp)
 #rosbuild_link_boost(lsdslam thread)
 
 
 # build live ros node
 add_executable(live_slam src/main_live_odometry.cpp)
 target_link_libraries(live_slam lsdslam ${catkin_LIBRARIES} ${G2O_LIBRARIES})
+add_dependencies(live_slam lsd_slam_viewer_generate_messages_cpp)
 
 
 # build image node
 add_executable(dataset src/main_on_images.cpp)
 target_link_libraries(dataset lsdslam ${catkin_LIBRARIES} ${G2O_LIBRARIES})
+add_dependencies(dataset lsd_slam_viewer_generate_messages_cpp)
 
 # TODO add INSTALL
 
